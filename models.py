@@ -9,6 +9,8 @@ class Granja(Model):
     fecha = CharField()
     lugar = CharField()
     comentario = CharField()
+    id_creador = IntegerField()
+    status = IntegerField()
 
     class Meta:
         database = db

@@ -9,8 +9,23 @@ from models import Granja, Participantes
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
+#
+#
+# INFO
+#
+#
+
 def info(bot, update):
     print "Info"
+
+#
+#
+# GRANJA
+#
+#
+
+def granja(bot, update):
+    print "Granja!"
 
 
 # TOKEN
@@ -19,6 +34,7 @@ updater = Updater(token)
 
 # COMANDOS
 updater.dispatcher.add_handler(CommandHandler('info', info))
+updater.dispatcher.add_handler(CommandHandler('granja', granja))
 
 # JOB QUEUE
 #jobqueue = updater.job_queue
