@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #from peewee import *
-from telegram.ext import Updater, CommandHandler, Job
+from telegram.ext import Updater, CommandHandler, Job, ConversationHandler
 import logging
 
 from models import Granja, Participantes
@@ -25,7 +25,11 @@ def info(bot, update):
 #
 
 def granja(bot, update):
-    print "Granja!"
+    print bot
+    print update
+    chat_id = update.message.chat.id
+    msg_str = "Granja!"
+    update.message.reply_text(msg_str)
 
 
 # TOKEN
