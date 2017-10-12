@@ -130,7 +130,7 @@ def cancel(bot, update):
 #
 
 conv_handler = ConversationHandler(
-    entry_points = [CommandHandler('granja', granja)],
+    entry_points = [CommandHandler('granja', granja, pass_user_data=True)],
 
     states = {
         FECHA: [MessageHandler(Filters.text, save_fecha, pass_user_data=True)],
