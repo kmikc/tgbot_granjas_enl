@@ -18,10 +18,13 @@ FECHA, LUGAR, COMENTARIO = range(3)
 #
 #
 
-def granja(bot, update):
-    chat_id = update.message.chat.id
+def granja(bot, update, user_data):
+    user_id = update.message.from_user.id
+    user_data['id_creador'] = user_id
     msg_str = "Organicemos la granja\nPongámosle fecha y hora"
     update.message.reply_text(msg_str)
+
+    print user_data
 
     return FECHA
 
@@ -38,6 +41,8 @@ def save_fecha(bot, update, user_data):
     user_data['fecha'] = text
     update.message.reply_text('¿Cuál será el punto de reunión?')
 
+    print user_data
+
     return LUGAR
 
 
@@ -52,6 +57,8 @@ def save_lugar(bot, update, user_data):
     text = update.message.text
     user_data['lugar'] = text
     update.message.reply_text('¿Algún comentario extra para agregar?')
+
+    print user_data
 
     return COMENTARIO
 
@@ -68,7 +75,10 @@ def save_comentario(bot, update, user_data):
     user_data['comentario'] = text
     update.message.reply_text('Listo!\nGuardando los datos...')
 
+    print user_data
+
     save_granja(bot, update, user_data)
+    return ConversationHandler.END
 
 
 #
@@ -83,7 +93,7 @@ def save_granja(bot, update, user_data):
     p_lugar = user_data['lugar']
     p_fecha = user_data['fecha']
     p_comentario = user_data['comentario']
-    p_creador = update.message.chat.id
+    p_creador = user_data['id_creador']
     p_titulo = "Granja!"
     p_status = 1
 
@@ -96,7 +106,7 @@ def save_granja(bot, update, user_data):
     q.execute()
 
     user_data.clear()
-    return ConversationHandler.END
+
 
 #
 #
@@ -110,8 +120,7 @@ def info(bot, update):
 
 
 def cancel(bot, update):
-    print "Cancel"
-    update.message.reply_text('Cancel')
+    update.message.reply_text('OK =)')
     return ConversationHandler.END
 
 #
