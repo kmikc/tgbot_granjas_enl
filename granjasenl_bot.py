@@ -2,8 +2,13 @@
 # -*- coding: utf-8 -*-
 
 #from peewee import *
-from telegram.ext import Updater, CommandHandler, Job, ConversationHandler, MessageHandler, Filters
+import re
+
+from telegram import InlineQueryResultArticle, ParseMode, \
+    InputTextMessageContent
+from telegram.ext import Updater, CommandHandler, Job, ConversationHandler, MessageHandler, Filters, InlineQueryHandler
 import logging
+from uuid import uuid4
 
 from models import Granja, Participantes
 
@@ -73,11 +78,13 @@ def save_comentario(bot, update, user_data):
     print "save_comentario"
     text = update.message.text
     user_data['comentario'] = text
-    update.message.reply_text('Listo!\nGuardando los datos...')
+    update.message.reply_text('Guardando los datos...')
 
     print user_data
 
     save_granja(bot, update, user_data)
+
+    update.message.reply_text('Listo!\nEl siguiente paso es publicarla en un grupo o canal.\nEscribiendo @granjas_enl_bot y buscando en el listado de granjas disponibles.')
     return ConversationHandler.END
 
 
@@ -123,6 +130,42 @@ def cancel(bot, update):
     update.message.reply_text('OK =)')
     return ConversationHandler.END
 
+
+
+
+
+
+def escape_markdown(text):
+    """Helper function to escape telegram markup symbols"""
+    escape_chars = '\*_`\['
+    return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
+
+
+def inlinequery(bot, update):
+    query = update.inline_query.query
+
+    results = list()
+
+    results.append(InlineQueryResultArticle(id=uuid4(),
+                                            title="Caps",
+                                            input_message_content=InputTextMessageContent(
+                                                query.upper())))
+
+    results.append(InlineQueryResultArticle(id=uuid4(),
+                                            title="Bold",
+                                            input_message_content=InputTextMessageContent(
+                                                "*%s*" % escape_markdown(query),
+                                                parse_mode=ParseMode.MARKDOWN)))
+
+    results.append(InlineQueryResultArticle(id=uuid4(),
+                                            title="Italic",
+                                            input_message_content=InputTextMessageContent(
+                                                "_%s_" % escape_markdown(query),
+                                                parse_mode=ParseMode.MARKDOWN)))
+
+    update.inline_query.answer(results)
+
+
 #
 #
 # ConversationHandler
@@ -150,6 +193,8 @@ updater.dispatcher.add_handler(CommandHandler('info', info))
 #updater.dispatcher.add_handler(CommandHandler('granja', granja))
 
 updater.dispatcher.add_handler(conv_handler)
+
+updater.dispatcher.add_handler(InlineQueryHandler(inlinequery))
 
 # JOB QUEUE
 #jobqueue = updater.job_queue
