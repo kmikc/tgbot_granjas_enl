@@ -142,26 +142,23 @@ def escape_markdown(text):
 
 
 def inlinequery(bot, update):
+    user_id = update.inline_query.from_user.id
     query = update.inline_query.query
 
+    q_granjas = Granja.select().where((Granja.id_creador==user_id) & (Granja.status==1))
+
     results = list()
+    for itemGranja in q_granjas:
+        print itemGranja.titulo, itemGranja.fecha, itemGranja.lugar, itemGranja.comentario, itemGranja.id_creador, itemGranja.status
+        results.append(InlineQueryResultArticle(id=uuid4(), title=itemGranja.fecha + '\n' + itemGranja.lugar, input_message_content=InputTextMessageContent(itemGranja.titulo + '\n' + itemGranja.fecha + '\n' + itemGranja.lugar + '\n' + itemGranja.comentario)))
 
-    results.append(InlineQueryResultArticle(id=uuid4(),
-                                            title="Caps",
-                                            input_message_content=InputTextMessageContent(
-                                                query.upper())))
 
-    results.append(InlineQueryResultArticle(id=uuid4(),
-                                            title="Bold",
-                                            input_message_content=InputTextMessageContent(
-                                                "*%s*" % escape_markdown(query),
-                                                parse_mode=ParseMode.MARKDOWN)))
 
-    results.append(InlineQueryResultArticle(id=uuid4(),
-                                            title="Italic",
-                                            input_message_content=InputTextMessageContent(
-                                                "_%s_" % escape_markdown(query),
-                                                parse_mode=ParseMode.MARKDOWN)))
+#    results = list()
+#    results.append(InlineQueryResultArticle(id=uuid4(), title="Caps", input_message_content=InputTextMessageContent(query.upper())))
+#    results.append(InlineQueryResultArticle(id=uuid4(), title="Bold", input_message_content=InputTextMessageContent("*%s*" % escape_markdown(query), parse_mode=ParseMode.MARKDOWN)))
+#    results.append(InlineQueryResultArticle(id=uuid4(), title="Italic", input_message_content=InputTextMessageContent("_%s_" % escape_markdown(query), parse_mode=ParseMode.MARKDOWN)))
+
 
     update.inline_query.answer(results)
 
