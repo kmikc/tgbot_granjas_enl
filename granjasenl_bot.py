@@ -131,9 +131,11 @@ def cancel(bot, update):
     return ConversationHandler.END
 
 
-
-
-
+#
+#
+# INLINE
+#
+#
 
 def escape_markdown(text):
     """Helper function to escape telegram markup symbols"""
@@ -145,14 +147,17 @@ def inlinequery(bot, update):
     user_id = update.inline_query.from_user.id
     query = update.inline_query.query
 
-    q_granjas = Granja.select().where((Granja.id_creador==user_id) & (Granja.status==1))
+    if query:
+        q_granjas = Granja.select().where((Granja.fecha.contains(query)) & (Granja.status==1) & (Granja.id_creador==user_id))
+    else:
+        q_granjas = Granja.select().where((Granja.status==1) & (Granja.id_creador==user_id))
 
     results = list()
     for itemGranja in q_granjas:
         print itemGranja.titulo, itemGranja.fecha, itemGranja.lugar, itemGranja.comentario, itemGranja.id_creador, itemGranja.status
         results.append(InlineQueryResultArticle(id=uuid4(), title=itemGranja.fecha + '\n' + itemGranja.lugar, input_message_content=InputTextMessageContent(itemGranja.titulo + '\n' + itemGranja.fecha + '\n' + itemGranja.lugar + '\n' + itemGranja.comentario)))
 
-
+    update.inline_query.answer(results)
 
 #    results = list()
 #    results.append(InlineQueryResultArticle(id=uuid4(), title="Caps", input_message_content=InputTextMessageContent(query.upper())))
@@ -160,7 +165,6 @@ def inlinequery(bot, update):
 #    results.append(InlineQueryResultArticle(id=uuid4(), title="Italic", input_message_content=InputTextMessageContent("_%s_" % escape_markdown(query), parse_mode=ParseMode.MARKDOWN)))
 
 
-    update.inline_query.answer(results)
 
 
 #
@@ -185,12 +189,14 @@ conv_handler = ConversationHandler(
 token = open('TOKEN').read().rstrip('\n')
 updater = Updater(token)
 
-# COMANDOS
+# COMANDOS - TO DO: Agregar comando para eliminar granjas pasadas
 updater.dispatcher.add_handler(CommandHandler('info', info))
 #updater.dispatcher.add_handler(CommandHandler('granja', granja))
 
+# HANDLER - Para crear granja
 updater.dispatcher.add_handler(conv_handler)
 
+# HANDLER - inline_query para listar granjas disponibles
 updater.dispatcher.add_handler(InlineQueryHandler(inlinequery))
 
 # JOB QUEUE
