@@ -125,10 +125,24 @@ def info(bot, update):
     print "Info"
     print update
 
+#
+#
+# CANCEL
+#
+#
 
 def cancel(bot, update):
     update.message.reply_text('OK =)')
     return ConversationHandler.END
+
+#
+#
+# CERRAR
+#
+#
+
+def cerrar(bot, update):
+    update.message.reply_text("En desarrollo...")
 
 
 #
@@ -191,6 +205,7 @@ updater = Updater(token)
 
 # COMANDOS - TO DO: Agregar comando para eliminar granjas pasadas
 updater.dispatcher.add_handler(CommandHandler('info', info))
+updater.dispatcher.add_handler(CommandHandler('cerrar', cerrar))
 #updater.dispatcher.add_handler(CommandHandler('granja', granja))
 
 # HANDLER - Para crear granja
