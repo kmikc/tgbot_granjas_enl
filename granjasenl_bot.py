@@ -4,11 +4,11 @@
 #from peewee import *
 import re
 
-from telegram import InlineQueryResultArticle, ParseMode, \
-    InputTextMessageContent
-from telegram.ext import Updater, CommandHandler, Job, ConversationHandler, MessageHandler, Filters, InlineQueryHandler
+from telegram import InlineQueryResultArticle, ParseMode, InputTextMessageContent, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, Job, ConversationHandler, MessageHandler, Filters, InlineQueryHandler, CallbackQueryHandler
 import logging
 from uuid import uuid4
+from emoji import emojize
 
 from models import Granja, Participantes
 
@@ -168,10 +168,15 @@ def inlinequery(bot, update):
 
     results = list()
     for itemGranja in q_granjas:
-        print itemGranja.titulo, itemGranja.fecha, itemGranja.lugar, itemGranja.comentario, itemGranja.id_creador, itemGranja.status
-        results.append(InlineQueryResultArticle(id=uuid4(), title=itemGranja.fecha + '\n' + itemGranja.lugar, input_message_content=InputTextMessageContent(itemGranja.titulo + '\n' + itemGranja.fecha + '\n' + itemGranja.lugar + '\n' + itemGranja.comentario)))
+        keyboard = [[InlineKeyboardButton(emojize("In :thumbsup:", use_aliases=True), callback_data='IN:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id}),
+                    InlineKeyboardButton(emojize("Out :thumbsdown:", use_aliases=True), callback_data='OUT:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id}),
+                    InlineKeyboardButton(emojize("mmm... :confused:", use_aliases=True), callback_data='MAYBE:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id})]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.inline_query.answer(results)
+        results.append(InlineQueryResultArticle(id=uuid4(), title=itemGranja.fecha + '\n' + itemGranja.lugar, input_message_content=InputTextMessageContent(itemGranja.titulo + '\n' + itemGranja.fecha + '\n' + itemGranja.lugar + '\n' + itemGranja.comentario), reply_markup=reply_markup))
+
+    update.inline_query.answer(results, cache_time=0)
+
 
 #    results = list()
 #    results.append(InlineQueryResultArticle(id=uuid4(), title="Caps", input_message_content=InputTextMessageContent(query.upper())))
@@ -179,6 +184,38 @@ def inlinequery(bot, update):
 #    results.append(InlineQueryResultArticle(id=uuid4(), title="Italic", input_message_content=InputTextMessageContent("_%s_" % escape_markdown(query), parse_mode=ParseMode.MARKDOWN)))
 
 
+def button(bot, update):
+    query = update.callback_query
+    p_userid = query.from_user.id
+    p_username = query.from_user.username
+
+    p_userselection = query.data.split(':')[0]
+    p_granjaid = query.data.split(':')[1]
+
+    if not query.from_user.first_name:
+        p_userfirstname = ''
+    else:
+        p_userfirstname = query.from_user.first_name
+
+    if not query.from_user.last_name:
+        p_userlastname = ''
+    else:
+        p_userlastname = query.from_user.last_name
+
+    print "---------------"
+    print "user id        : %s" % p_userid
+    print "username       : %s" % p_username
+    print "user first_name: %s" % p_userfirstname
+    print "user last_name : %s" % p_userlastname
+    print "selection      : %s" % p_userselection
+    print "granja id      : %s" % p_granjaid
+
+    count_regs = Participantes.select().where( (Participantes.granja_id == p_granjaid) & (Participantes.user_id == p_userid) ).count()
+    print "count_regs     : %s" % count_regs
+    q = Participantes.insert(user_id=p_userid, granja_id=p_granjaid, user_name=p_userfirstname + ' ' + p_userlastname, user_nick=p_username, status=p_userselection)
+    q.execute()
+
+    #bot.edit_message_text(text="Selected option: {}".format(query.data), chat_id=query.message.chat_id, message_id=query.message.message_id)
 
 
 #
@@ -207,6 +244,8 @@ updater = Updater(token)
 updater.dispatcher.add_handler(CommandHandler('info', info))
 updater.dispatcher.add_handler(CommandHandler('cerrar', cerrar))
 #updater.dispatcher.add_handler(CommandHandler('granja', granja))
+
+updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
 # HANDLER - Para crear granja
 updater.dispatcher.add_handler(conv_handler)
