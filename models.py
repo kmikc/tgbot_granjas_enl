@@ -18,6 +18,7 @@ class Granja(Model):
 
 class Participantes(Model):
     id = IntegerField(primary_key=True)
+    granja_id = IntegerField()
     user_id = IntegerField()
     user_name = CharField()
     user_nick = CharField()
