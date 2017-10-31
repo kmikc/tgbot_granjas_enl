@@ -240,7 +240,12 @@ def get_participantes(p_granja_id):
         if participante.status == 'MAYBE':
             participantes_maybe.append(participante.user_nick)
 
-    return "\n\n" + str(participantes_in)
+    str_in = str(participantes_in)
+    str_out = str(participantes_out)
+    str_maybe = str(participantes_maybe)
+
+    str_return = "\n\nConfirmados:\n" + str_in + "\n\nNo van:\n" + str_out + "\n\nIndecisos:\n" + str_maybe
+    return str_return
 
 #
 #
