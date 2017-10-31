@@ -173,7 +173,7 @@ def inlinequery(bot, update):
                     InlineKeyboardButton(emojize("mmm... :confused:", use_aliases=True), callback_data='MAYBE:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id})]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
-        results.append(InlineQueryResultArticle(id=uuid4(), title=itemGranja.fecha + '\n' + itemGranja.lugar, input_message_content=InputTextMessageContent(itemGranja.titulo + '\n' + itemGranja.fecha + '\n' + itemGranja.lugar + '\n' + itemGranja.comentario), reply_markup=reply_markup))
+        results.append(InlineQueryResultArticle(id=uuid4(), title=itemGranja.fecha + '\n' + itemGranja.lugar, input_message_content=InputTextMessageContent(itemGranja.titulo + '\nFecha: ' + itemGranja.fecha + '\nLugar de encuentro: ' + itemGranja.lugar + '\nComentarios: ' + itemGranja.comentario + get_participantes(itemGranja.id)), reply_markup=reply_markup))
 
     update.inline_query.answer(results, cache_time=0)
 
@@ -217,6 +217,30 @@ def button(bot, update):
 
     #bot.edit_message_text(text="Selected option: {}".format(query.data), chat_id=query.message.chat_id, message_id=query.message.message_id)
 
+#
+#
+# Listado de particpantes
+#
+#
+
+def get_participantes(p_granja_id):
+    q_participantes = Participantes.select().where(Participantes.granja_id == p_granja_id).group_by(Participantes.user_id).order_by(Participantes.id.desc())
+
+    participantes_in = list()
+    participantes_out = list()
+    participantes_maybe = list()
+
+    for participante in q_participantes:
+        if participante.status == 'IN':
+            participantes_in.append(participante.user_nick)
+
+        if participante.status == 'OUT':
+            participantes_out.append(participante.user_nick)
+
+        if participante.status == 'MAYBE':
+            participantes_maybe.append(participante.user_nick)
+
+    return "\n\n" + str(participantes_in)
 
 #
 #
