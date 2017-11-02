@@ -187,33 +187,42 @@ def inlinequery(bot, update):
 def button(bot, update):
     query = update.callback_query
     p_userid = query.from_user.id
-    p_username = query.from_user.username
+
+    if not query.from_user.username:
+        p_username = ''
+    else:
+        p_username = '@' + query.from_user.username
 
     p_userselection = query.data.split(':')[0]
     p_granjaid = query.data.split(':')[1]
 
-    if not query.from_user.first_name:
-        p_userfirstname = ''
+    if p_userselection == "REFRESH":
+        print "REFRESH"
+        print update
+        #bot.edit_message_text(text="Name", chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=ForceReply(True))
     else:
-        p_userfirstname = query.from_user.first_name
+        if not query.from_user.first_name:
+            p_userfirstname = ''
+        else:
+            p_userfirstname = query.from_user.first_name
 
-    if not query.from_user.last_name:
-        p_userlastname = ''
-    else:
-        p_userlastname = query.from_user.last_name
+        if not query.from_user.last_name:
+            p_userlastname = ''
+        else:
+            p_userlastname = query.from_user.last_name
 
-    print "---------------"
-    print "user id        : %s" % p_userid
-    print "username       : %s" % p_username
-    print "user first_name: %s" % p_userfirstname
-    print "user last_name : %s" % p_userlastname
-    print "selection      : %s" % p_userselection
-    print "granja id      : %s" % p_granjaid
+        print "---------------"
+        print "user id        : %s" % p_userid
+        print "username       : %s" % p_username
+        print "user first_name: %s" % p_userfirstname
+        print "user last_name : %s" % p_userlastname
+        print "selection      : %s" % p_userselection
+        print "granja id      : %s" % p_granjaid
 
-    count_regs = Participantes.select().where( (Participantes.granja_id == p_granjaid) & (Participantes.user_id == p_userid) ).count()
-    print "count_regs     : %s" % count_regs
-    q = Participantes.insert(user_id=p_userid, granja_id=p_granjaid, user_name=p_userfirstname + ' ' + p_userlastname, user_nick=p_username, status=p_userselection)
-    q.execute()
+        count_regs = Participantes.select().where( (Participantes.granja_id == p_granjaid) & (Participantes.user_id == p_userid) ).count()
+        print "count_regs     : %s" % count_regs
+        q = Participantes.insert(user_id=p_userid, granja_id=p_granjaid, user_name=p_userfirstname + ' ' + p_userlastname, user_nick=p_username, status=p_userselection)
+        q.execute()
 
     #bot.edit_message_text(text="Selected option: {}".format(query.data), chat_id=query.message.chat_id, message_id=query.message.message_id)
 
@@ -240,9 +249,9 @@ def get_participantes(p_granja_id):
         if participante.status == 'MAYBE':
             participantes_maybe.append(participante.user_nick)
 
-    str_in = str(participantes_in)
-    str_out = str(participantes_out)
-    str_maybe = str(participantes_maybe)
+    str_in = "\n".join(participantes_in)
+    str_out = "\n".join(participantes_out)
+    str_maybe = "\n".join(participantes_maybe)
 
     str_return = "\n\nConfirmados:\n" + str_in + "\n\nNo van:\n" + str_out + "\n\nIndecisos:\n" + str_maybe
     return str_return
