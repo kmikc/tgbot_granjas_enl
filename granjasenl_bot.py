@@ -171,6 +171,7 @@ def inlinequery(bot, update):
         keyboard = [[InlineKeyboardButton(emojize("In :thumbsup:", use_aliases=True), callback_data='IN:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id}),
                     InlineKeyboardButton(emojize("Out :thumbsdown:", use_aliases=True), callback_data='OUT:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id}),
                     InlineKeyboardButton(emojize("mmm... :confused:", use_aliases=True), callback_data='MAYBE:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id})]]
+#                    InlineKeyboardButton(emojize("Actualizar", use_aliases=True), callback_data='REFRESH:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id})]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         results.append(InlineQueryResultArticle(id=uuid4(), title=itemGranja.fecha + '\n' + itemGranja.lugar, input_message_content=InputTextMessageContent(itemGranja.titulo + '\nFecha: ' + itemGranja.fecha + '\nLugar de encuentro: ' + itemGranja.lugar + '\nComentarios: ' + itemGranja.comentario + get_participantes(itemGranja.id)), reply_markup=reply_markup))
@@ -186,6 +187,7 @@ def inlinequery(bot, update):
 
 def button(bot, update):
     query = update.callback_query
+    print query
     p_userid = query.from_user.id
 
     if not query.from_user.username:
@@ -199,7 +201,13 @@ def button(bot, update):
     if p_userselection == "REFRESH":
         print "REFRESH"
         print update
-        #bot.edit_message_text(text="Name", chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=ForceReply(True))
+
+#        keyboard = [[InlineKeyboardButton(emojize("In :thumbsup:", use_aliases=True), callback_data='IN:' + str(p_granjaid), kwargs={'granja_id': p_granjaid}),
+#                    InlineKeyboardButton(emojize("Out :thumbsdown:", use_aliases=True), callback_data='OUT:' + str(p_granjaid), kwargs={'granja_id': p_granjaid}),
+#                    InlineKeyboardButton(emojize("mmm... :confused:", use_aliases=True), callback_data='MAYBE:' + str(p_granjaid), kwargs={'granja_id': p_granjaid}),
+#                    InlineKeyboardButton(emojize("Actualizar", use_aliases=True), callback_data='REFRESH:' + str(p_granjaid), kwargs={'granja_id': p_granjaid})]]
+#        reply_markup = InlineKeyboardMarkup(keyboard)
+#        bot.edit_message_text(text="Bla, bla, bla...", chat_id=None, message_id=update.callback_query.inline_message_id, reply_markup=reply_markup)
     else:
         if not query.from_user.first_name:
             p_userfirstname = ''
