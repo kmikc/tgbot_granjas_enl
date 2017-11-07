@@ -29,7 +29,7 @@ def granja(bot, update, user_data):
     msg_str = "Organicemos la granja\nPongámosle fecha y hora"
     update.message.reply_text(msg_str)
 
-    print user_data
+    print (user_data)
 
     return FECHA
 
@@ -41,12 +41,12 @@ def granja(bot, update, user_data):
 #
 
 def save_fecha(bot, update, user_data):
-    print "save_fecha"
+    print ("save_fecha")
     text = update.message.text
     user_data['fecha'] = text
     update.message.reply_text('¿Cuál será el punto de reunión?')
 
-    print user_data
+    print (user_data)
 
     return LUGAR
 
@@ -58,12 +58,12 @@ def save_fecha(bot, update, user_data):
 #
 
 def save_lugar(bot, update, user_data):
-    print "save_lugar"
+    print ("save_lugar")
     text = update.message.text
     user_data['lugar'] = text
     update.message.reply_text('¿Algún comentario extra para agregar?')
 
-    print user_data
+    print (user_data)
 
     return COMENTARIO
 
@@ -75,12 +75,12 @@ def save_lugar(bot, update, user_data):
 #
 
 def save_comentario(bot, update, user_data):
-    print "save_comentario"
+    print ("save_comentario")
     text = update.message.text
     user_data['comentario'] = text
     update.message.reply_text('Guardando los datos...')
 
-    print user_data
+    print (user_data)
 
     save_granja(bot, update, user_data)
 
@@ -95,7 +95,7 @@ def save_comentario(bot, update, user_data):
 #
 
 def save_granja(bot, update, user_data):
-    print "Guardando granja..."
+    print ("Guardando granja...")
 
     p_lugar = user_data['lugar']
     p_fecha = user_data['fecha']
@@ -104,10 +104,10 @@ def save_granja(bot, update, user_data):
     p_titulo = "Granja!"
     p_status = 1
 
-    print "p_lugar: %s" % p_lugar
-    print "p_fecha: %s" % p_fecha
-    print "p_comentario: %s" % p_comentario
-    print "p_creador: %s" % p_creador
+    print ("p_lugar: %s" % p_lugar)
+    print ("p_fecha: %s" % p_fecha)
+    print ("p_comentario: %s" % p_comentario)
+    print ("p_creador: %s" % p_creador)
 
     q = Granja.insert(titulo=p_titulo, fecha=p_fecha, lugar=p_lugar, comentario=p_comentario, id_creador=p_creador, status=p_status)
     q.execute()
@@ -122,8 +122,8 @@ def save_granja(bot, update, user_data):
 #
 
 def info(bot, update):
-    print "Info"
-    print update
+    print ("Info")
+    print (update)
 
 #
 #
@@ -187,7 +187,7 @@ def inlinequery(bot, update):
 
 def button(bot, update):
     query = update.callback_query
-    print query
+    print (query)
     p_userid = query.from_user.id
 
     if not query.from_user.username:
@@ -199,8 +199,8 @@ def button(bot, update):
     p_granjaid = query.data.split(':')[1]
 
     if p_userselection == "REFRESH":
-        print "REFRESH"
-        print update
+        print ("REFRESH")
+        print (update)
 
 #        keyboard = [[InlineKeyboardButton(emojize("In :thumbsup:", use_aliases=True), callback_data='IN:' + str(p_granjaid), kwargs={'granja_id': p_granjaid}),
 #                    InlineKeyboardButton(emojize("Out :thumbsdown:", use_aliases=True), callback_data='OUT:' + str(p_granjaid), kwargs={'granja_id': p_granjaid}),
@@ -219,16 +219,16 @@ def button(bot, update):
         else:
             p_userlastname = query.from_user.last_name
 
-        print "---------------"
-        print "user id        : %s" % p_userid
-        print "username       : %s" % p_username
-        print "user first_name: %s" % p_userfirstname
-        print "user last_name : %s" % p_userlastname
-        print "selection      : %s" % p_userselection
-        print "granja id      : %s" % p_granjaid
+        print ("---------------")
+        print ("user id        : %s" % p_userid)
+        print ("username       : %s" % p_username)
+        print ("user first_name: %s" % p_userfirstname)
+        print ("user last_name : %s" % p_userlastname)
+        print ("selection      : %s" % p_userselection)
+        print ("granja id      : %s" % p_granjaid)
 
         count_regs = Participantes.select().where( (Participantes.granja_id == p_granjaid) & (Participantes.user_id == p_userid) ).count()
-        print "count_regs     : %s" % count_regs
+        print ("count_regs     : %s" % count_regs)
         q = Participantes.insert(user_id=p_userid, granja_id=p_granjaid, user_name=p_userfirstname + ' ' + p_userlastname, user_nick=p_username, status=p_userselection)
         q.execute()
 
