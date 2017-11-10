@@ -260,13 +260,22 @@ def get_participantes(p_granja_id):
 
     for participante in q_participantes:
         if participante.status == 'IN':
-            participantes_in.append(participante.user_nick)
+            if not participante.user_nick:
+                participantes_in.append(participante.name)
+            else:
+                participantes_in.append(participante.user_nick)
 
         if participante.status == 'OUT':
-            participantes_out.append(participante.user_nick)
+            if not participante.user_nick:
+                participantes_out.append(participante.user_name)
+            else:
+                participantes_out.append(participante.user_nick)
 
         if participante.status == 'MAYBE':
-            participantes_maybe.append(participante.user_nick)
+            if not participante.user_nick:
+                participantes_maybe.append(participante.user_name)
+            else:
+                participantes_maybe.append(participante.user_nick)
 
     str_in = "\n".join(participantes_in)
     str_out = "\n".join(participantes_out)
