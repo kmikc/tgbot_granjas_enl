@@ -232,6 +232,17 @@ def button(bot, update):
         q = Participantes.insert(user_id=p_userid, granja_id=p_granjaid, user_name=p_userfirstname + ' ' + p_userlastname, user_nick=p_username, status=p_userselection)
         q.execute()
 
+        if p_userselection == 'IN':
+            str_message = "Gracias!\nNos vemos en la granja\n\nTu voto ya está contabilizado, pronto se actualizará el listado de participantes"
+        elif p_userselection == 'OUT':
+            str_message = "Buuu... =(\nPara la próxima\n\nTu voto ya está contabilizado, pronto se actualizará el listado de participantes"
+        elif p_userselection == 'MAYBE':
+            str_message = "Ojalá que luego se transforme en un IN =)\n\nTu voto ya está contabilizado, pronto se actualizará el listado de participantes"
+        elif p_userselection == 'REFRESH':
+            str_message = "Listado actualizado"
+
+        update.callback_query.answer(text=str_message, show_alert=True)
+
     #bot.edit_message_text(text="Selected option: {}".format(query.data), chat_id=query.message.chat_id, message_id=query.message.message_id)
 
 #
