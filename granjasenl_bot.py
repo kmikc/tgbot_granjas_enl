@@ -168,21 +168,23 @@ def inlinequery(bot, update):
 
     results = list()
     for itemGranja in q_granjas:
-        keyboard = [[InlineKeyboardButton(emojize("In :thumbsup:", use_aliases=True), callback_data='IN:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id}),
-                    InlineKeyboardButton(emojize("Out :thumbsdown:", use_aliases=True), callback_data='OUT:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id}),
-                    InlineKeyboardButton(emojize("mmm... :confused:", use_aliases=True), callback_data='MAYBE:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id})]]
-#                    InlineKeyboardButton(emojize("Actualizar", use_aliases=True), callback_data='REFRESH:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id})]]
+        keyboard =  [
+                        [
+                            InlineKeyboardButton(emojize("In :thumbsup:", use_aliases=True), callback_data='IN:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id}),
+                            InlineKeyboardButton(emojize("Out :thumbsdown:", use_aliases=True), callback_data='OUT:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id}),
+                            InlineKeyboardButton(emojize("mmm... :confused:", use_aliases=True), callback_data='MAYBE:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id})
+                        ],
+                        [
+                            InlineKeyboardButton(emojize("Actualizar", use_aliases=True), callback_data='REFRESH:' + str(itemGranja.id), kwargs={'granja_id': itemGranja.id})
+                        ]
+                    ]
+#
+
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         results.append(InlineQueryResultArticle(id=uuid4(), title=itemGranja.fecha + '\n' + itemGranja.lugar, input_message_content=InputTextMessageContent(itemGranja.titulo + '\nFecha: ' + itemGranja.fecha + '\nLugar de encuentro: ' + itemGranja.lugar + '\nComentarios: ' + itemGranja.comentario + get_participantes(itemGranja.id)), reply_markup=reply_markup))
 
     update.inline_query.answer(results, cache_time=0)
-
-
-#    results = list()
-#    results.append(InlineQueryResultArticle(id=uuid4(), title="Caps", input_message_content=InputTextMessageContent(query.upper())))
-#    results.append(InlineQueryResultArticle(id=uuid4(), title="Bold", input_message_content=InputTextMessageContent("*%s*" % escape_markdown(query), parse_mode=ParseMode.MARKDOWN)))
-#    results.append(InlineQueryResultArticle(id=uuid4(), title="Italic", input_message_content=InputTextMessageContent("_%s_" % escape_markdown(query), parse_mode=ParseMode.MARKDOWN)))
 
 
 def button(bot, update):
@@ -200,14 +202,8 @@ def button(bot, update):
 
     if p_userselection == "REFRESH":
         print ("REFRESH")
-        print (update)
+        actualizar_listado(p_granjaid, query, bot)
 
-#        keyboard = [[InlineKeyboardButton(emojize("In :thumbsup:", use_aliases=True), callback_data='IN:' + str(p_granjaid), kwargs={'granja_id': p_granjaid}),
-#                    InlineKeyboardButton(emojize("Out :thumbsdown:", use_aliases=True), callback_data='OUT:' + str(p_granjaid), kwargs={'granja_id': p_granjaid}),
-#                    InlineKeyboardButton(emojize("mmm... :confused:", use_aliases=True), callback_data='MAYBE:' + str(p_granjaid), kwargs={'granja_id': p_granjaid}),
-#                    InlineKeyboardButton(emojize("Actualizar", use_aliases=True), callback_data='REFRESH:' + str(p_granjaid), kwargs={'granja_id': p_granjaid})]]
-#        reply_markup = InlineKeyboardMarkup(keyboard)
-#        bot.edit_message_text(text="Bla, bla, bla...", chat_id=None, message_id=update.callback_query.inline_message_id, reply_markup=reply_markup)
     else:
         if not query.from_user.first_name:
             p_userfirstname = ''
@@ -233,17 +229,43 @@ def button(bot, update):
         q.execute()
 
         if p_userselection == 'IN':
-            str_message = "Gracias!\nNos vemos en la granja\n\nTu voto ya está contabilizado, pronto se actualizará el listado de participantes"
+            str_message = "Gracias!\nNos vemos en la granja"
         elif p_userselection == 'OUT':
-            str_message = "Buuu... =(\nPara la próxima\n\nTu voto ya está contabilizado, pronto se actualizará el listado de participantes"
+            str_message = "Buuu... =(\nPara la próxima"
         elif p_userselection == 'MAYBE':
-            str_message = "Ojalá que luego se transforme en un IN =)\n\nTu voto ya está contabilizado, pronto se actualizará el listado de participantes"
+            str_message = "Ojalá que luego se transforme en un IN =)"
         elif p_userselection == 'REFRESH':
             str_message = "Listado actualizado"
 
+        # Muestra alerta
         update.callback_query.answer(text=str_message, show_alert=True)
 
-    #bot.edit_message_text(text="Selected option: {}".format(query.data), chat_id=query.message.chat_id, message_id=query.message.message_id)
+    actualizar_listado(p_granjaid, query, bot)
+
+#
+#
+# Actualizar mensaje Granja y participantes
+#
+#
+
+def actualizar_listado(granja_id, query, bot):
+    q_granja = Granja.select().where(Granja.id==granja_id).get()
+    txt_granja = q_granja.titulo + '\nFecha: ' + q_granja.fecha + '\nLugar de encuentro: ' + q_granja.lugar + '\nComentarios: ' + q_granja.comentario + get_participantes(granja_id)
+
+    keyboard =  [
+                    [
+                        InlineKeyboardButton(emojize("In :thumbsup:", use_aliases=True), callback_data="IN:" + granja_id, kwargs={'granja_id': granja_id}),
+                        InlineKeyboardButton(emojize("Out :thumbsdown:", use_aliases=True), callback_data="OUT:" + granja_id, kwargs={'granja_id': granja_id}),
+                        InlineKeyboardButton(emojize("mmm... :confused:", use_aliases=True), callback_data="MAYBE:" + granja_id, kwargs={'granja_id': granja_id})
+                    ],
+                    [
+                        InlineKeyboardButton(emojize("Actualizar", use_aliases=True), callback_data="REFRESH:" + granja_id, kwargs={'granja_id': granja_id})
+                    ]
+                ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    bot.edit_message_text(chat_id=None, inline_message_id=query.inline_message_id, text=txt_granja, reply_markup=reply_markup)
 
 #
 #
