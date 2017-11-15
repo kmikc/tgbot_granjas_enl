@@ -283,7 +283,7 @@ def get_participantes(p_granja_id):
     for participante in q_participantes:
         if participante.status == 'IN':
             if not participante.user_nick:
-                participantes_in.append(participante.name)
+                participantes_in.append(participante.user_name)
             else:
                 participantes_in.append(participante.user_nick)
 
