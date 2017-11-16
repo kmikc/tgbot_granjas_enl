@@ -240,7 +240,8 @@ def button(bot, update):
         # Muestra alerta
         update.callback_query.answer(text=str_message, show_alert=True)
 
-    actualizar_listado(p_granjaid, query, bot)
+        # Actualiza listado
+        actualizar_listado(p_granjaid, query, bot)
 
 #
 #
