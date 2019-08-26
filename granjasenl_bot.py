@@ -164,7 +164,7 @@ def inlinequery(bot, update):
     if query:
         q_granjas = Granja.select().where((Granja.fecha.contains(query)) & (Granja.status==1) & (Granja.id_creador==user_id))
     else:
-        q_granjas = Granja.select().where((Granja.status==1) & (Granja.id_creador==user_id))
+        q_granjas = Granja.select().where((Granja.status==1) & (Granja.id_creador==user_id)).order_by(Granja.creacion.desc()).limit(5)
 
     results = list()
     for itemGranja in q_granjas:

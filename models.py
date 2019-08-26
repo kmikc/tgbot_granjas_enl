@@ -11,10 +11,12 @@ class Granja(Model):
     comentario = CharField()
     id_creador = IntegerField()
     status = IntegerField()
+    creacion = DateTimeField()
 
     class Meta:
         database = db
         db_table = "genl_granja"
+
 
 class Participantes(Model):
     id = IntegerField(primary_key=True)
